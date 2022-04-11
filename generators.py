@@ -1,16 +1,47 @@
+from ctypes import Union
+
+
+simple_logins = ['admin', 'jack', 'cat'] # список логинов для нашего локального сервера
 alphabet = '0123456789abcdefghijklmnopqrstuvwxyz' # алфавит с.с
 base = len(alphabet) # основание алфавита
 
-def generate_by_brute_force(num: int, length: int):
-    """Генерация пароля брутфорсом
+def generate_simple_login(state: Union[int, None]):
+    """Генерация очередного логина из списка simple_logins
 
     Args:
-        num (int): число, соответствующее очередному генерируемому паролю
-        length (int): необходимая длина генерируемого пароля
+        state (Union[int, None]): состояние для генерации очередного логина
 
     Returns:
-        password(str): сгенерированный пароль
+        tuple: сгенерированный логин и след. состояние для последующей генерации логина
     """
+    if state is None: # ожидается, что первый state = None
+        state = 0
+
+    # генерация следующего состояния
+    # next_state передается при следующем вызове как state и нужен для генерации следующего логина
+    if state == len(simple_logins) - 1: # если дошли до конца списка simple_logins
+        next_state = None
+    else:
+        next_state = state + 1
+
+    # next_state нужен для того, чтобы потом передать его в качестве параметра state 
+    # для генерации следующего лоигна
+    return simple_logins[state], next_state
+
+def generate_by_brute_force(state: Union[list, None]):
+    """Генерация очередного пароля брутфорсом
+
+    Args:
+        state (Union[list, None]): состояние для генерации очередного пароля брутфорсом
+
+    Returns:
+        tuple: сгенерированный брутфорсом пароль и след. состояние для последующей генерации пароля
+    """
+    if state is None: # ожидается, что первый state = None
+        state = [0, 0] # в качестве состояния указываем число, соответствующее очередному генерируемому паролю (num) и длину очередного генерируемого пароля (length)
+    
+    num, length = state # распаковываем данные из состояния
+
     password = '' # инициализируем переменную пароля
     temp = num # заводим под число временную переменную, чтобы проделывать с ней операции, не затерев само число
     # обычный алгоритм перевода из 10 сс в n сс
@@ -32,4 +63,7 @@ def generate_by_brute_force(num: int, length: int):
     else:
         num += 1
 
-    return password
+    next_state = [num, length] # формируем следующее состояние для последющей генерации пароля
+
+    # возвращаем сам сгенерированный пароль и след. состояние
+    return password, next_state
