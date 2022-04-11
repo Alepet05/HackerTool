@@ -4,6 +4,28 @@ from ctypes import Union
 simple_logins = ['admin', 'jack', 'cat'] # список логинов для нашего локального сервера
 alphabet = '0123456789abcdefghijklmnopqrstuvwxyz' # алфавит с.с
 base = len(alphabet) # основание алфавита
+# считываем список самых популярных паролей из файла
+with open('10-million-password-list-top-1000000.txt') as f:
+    popular_passwords = f.read().split('\n')
+
+def generate_popular_password(state: Union[int, None]):
+    """Генерация популярных паролей
+
+    Args:
+        state (Union[int, None]): состояние для генерации очередного пароля
+
+    Returns:
+        tuple: генерированный пароль и след. состояние для последующей генерации пароля
+    """
+    if state is None:  # ожидается, что первый state = None
+        state = 0
+
+    if state == len(popular_passwords) - 1: # если дошли до конца списка popular_passwords
+        next_state = None
+    else:
+        next_state = state + 1
+
+    return popular_passwords[state], next_state
 
 def generate_simple_login(state: Union[int, None]):
     """Генерация очередного логина из списка simple_logins
